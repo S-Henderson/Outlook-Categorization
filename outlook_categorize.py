@@ -57,19 +57,32 @@ named_category = 'Scotty'
 
 #--------------- CATEGORIZE & DOWNLOAD ---------------
 
+"""
+# TEST v2
+    if messages[i].Subject in test_list:
+"""
+
+test_list = ["RAC Different Dates Report",
+           "All Clients Duplicate Serial Report",
+           "RAC CVI Consumer Check v2 Report",
+           "RAC HVAC Cross Module Compliance",
+           "Lennox Dup Serial Exception Report",
+           "Lennox Duplicate Serial report",
+           "RAC Lennox Potential Over Payments report"]
+
 print("*************************")
 
 # Finds report emails to categorize & download
 for i in range(messages.Count):
     
-    # Manually insert start of email subject of report to find
-    if messages[i].Subject.startswith("[Data Report] Please find attached the RAC Different Dates Report") or \
-       messages[i].Subject.startswith("[Data Report] Please find attached All Clients Duplicate Serial Report") or \
-       messages[i].Subject.startswith("[Data Report] Please find attached the RAC CVI Consumer Check v2 Report") or \
-       messages[i].Subject.startswith("[Data Report] RAC HVAC Cross Module Compliance") or \
-       messages[i].Subject.startswith("[Data Report] Please find attached the Lennox Dup Serial Exception Report") or \
-       messages[i].Subject.startswith("Please find attached the Lennox Duplicate Serial report") or \
-       messages[i].Subject.startswith("[Data Report] RAC Lennox Potential Over Payments report"):
+    # TEST
+    if messages[i].Subject in ["RAC Different Dates Report",
+                               "All Clients Duplicate Serial Report",
+                               "RAC CVI Consumer Check v2 Report",
+                               "RAC HVAC Cross Module Compliance",
+                               "Lennox Dup Serial Exception Report",
+                               "Lennox Duplicate Serial report",
+                               "RAC Lennox Potential Over Payments report"]:
 
         # Categorize
         messages[i].GetInspector()
