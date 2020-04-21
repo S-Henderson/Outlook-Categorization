@@ -76,13 +76,13 @@ print("*************************")
 for i in range(messages.Count):
     
     # TEST
-    if messages[i].Subject in ["RAC Different Dates Report",
+    if any(messages[i].Subject in ["RAC Different Dates Report",
                                "All Clients Duplicate Serial Report",
                                "RAC CVI Consumer Check v2 Report",
                                "RAC HVAC Cross Module Compliance",
                                "Lennox Dup Serial Exception Report",
                                "Lennox Duplicate Serial report",
-                               "RAC Lennox Potential Over Payments report"]:
+                               "RAC Lennox Potential Over Payments report"]):
 
         # Categorize
         messages[i].GetInspector()
