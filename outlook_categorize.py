@@ -1,15 +1,28 @@
 """
 By: Scott Henderson
-Last Updated: Apr 18, 2020
+Last Updated: Apr 22, 2020
 Purpose: In Outlook find reports to categorize and download attachments based on Subject line search
 """
 
 import os
+
 from win32com.client import Dispatch
+
+#--------------- PURPOSE ---------------
 
 print("Purpose: In Outlook find reports to categorize and download attachments based on Subject line search")
 
 print("*************************")
+
+#--------------- ASCII ART ---------------
+print(r"""
+________          __  .__                 __     _________         __                             .__               
+\_____  \  __ ___/  |_|  |   ____   ____ |  | __ \_   ___ \_____ _/  |_  ____   ____   ___________|__|_______ ____  
+ /   |   \|  |  \   __\  |  /  _ \ /  _ \|  |/ / /    \  \/\__  \\   __\/ __ \ / ___\ /  _ \_  __ \  \___   // __ \ 
+/    |    \  |  /|  | |  |_(  <_> |  <_> )    <  \     \____/ __ \|  | \  ___// /_/  >  <_> )  | \/  |/    /\  ___/ 
+\_______  /____/ |__| |____/\____/ \____/|__|_ \  \______  (____  /__|  \___  >___  / \____/|__|  |__/_____ \\___  >
+        \/                                    \/         \/     \/          \/_____/                       \/    \/ 
+""")
 
 #--------------- SETUP ---------------
 
@@ -59,10 +72,10 @@ named_category = 'Scotty'
 
 print("*************************")
 
-# Finds report emails to categorize & download
+# Loop to find report emails to categorize & download
 for i in range(messages.Count):
     
-    # Manually insert start of email subject of report to find
+    # Manually insert partial name match of report to find -> based on Subject line search
     if "RAC Different Dates Report" in messages[i].Subject or \
        "All Clients Duplicate Serial Report" in messages[i].Subject or \
        "RAC CVI Consumer Check v2 Report" in messages[i].Subject or \
