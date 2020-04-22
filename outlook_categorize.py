@@ -63,13 +63,13 @@ print("*************************")
 for i in range(messages.Count):
     
     # Manually insert start of email subject of report to find
-    if messages[i].Subject.startswith("[Data Report] Please find attached the RAC Different Dates Report") or \
-       messages[i].Subject.startswith("[Data Report] Please find attached All Clients Duplicate Serial Report") or \
-       messages[i].Subject.startswith("[Data Report] Please find attached the RAC CVI Consumer Check v2 Report") or \
-       messages[i].Subject.startswith("[Data Report] RAC HVAC Cross Module Compliance") or \
-       messages[i].Subject.startswith("[Data Report] Please find attached the Lennox Dup Serial Exception Report") or \
-       messages[i].Subject.startswith("Please find attached the Lennox Duplicate Serial report") or \
-       messages[i].Subject.startswith("[Data Report] RAC Lennox Potential Over Payments report"):
+    if "RAC Different Dates Report" in messages[i].Subject or \
+       "All Clients Duplicate Serial Report" in messages[i].Subject or \
+       "RAC CVI Consumer Check v2 Report" in messages[i].Subject or \
+       "RAC HVAC Cross Module Compliance" in messages[i].Subject or \
+       "Lennox Dup Serial Exception Report" in messages[i].Subject or \
+       "Lennox Duplicate Serial report" in messages[i].Subject or \
+       "RAC Lennox Potential Over Payments report" in messages[i].Subject:
 
         # Categorize
         messages[i].GetInspector()
