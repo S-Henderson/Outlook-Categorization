@@ -1,8 +1,7 @@
-
 """
 By: Scott Henderson
-Last Updated: Apr 22, 2020
-Purpose: In Outlook find reports to categorize and downloads attachments based on Subject line search
+Last Updated: May 20, 2020
+Purpose: In Outlook, find reports to categorize and download attachment based on Subject line search
 """
 
 import os
@@ -16,6 +15,7 @@ print("Purpose: In Outlook find reports to categorize and downloads attachments 
 print("*************************")
 
 #--------------- ASCII ART ---------------
+
 print(r"""
 ________          __  .__                 __     _________         __                             .__               
 \_____  \  __ ___/  |_|  |   ____   ____ |  | __ \_   ___ \_____ _/  |_  ____   ____   ___________|__|_______ ____  
@@ -25,112 +25,89 @@ ________          __  .__                 __     _________         __           
         \/                                    \/         \/     \/          \/_____/                       \/    \/ 
 """)
 
-#--------------- SETUP ---------------
+#--------------- CONNECTION ---------------
 
-# Set download path for report files
-file_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Downloads') # Change 2nd string to change final location
+save_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Downloads') # Set download path for report files
 
-# Change working directory to download path
-os.chdir(file_path)
+outlook = Dispatch("Outlook.Application").GetNamespace("MAPI")                 # Outlook connection
 
-print("The Download File Path is -> " + file_path)
+#--------------- SELECT FOLDERS ---------------
 
-print("*************************")
+root_folder = outlook.Folders.Item("RAC Reporting")                            # Set main folder
+sub_folder = root_folder.Folders['Inbox']                                      # Set sub folder -> usually just Inbox
 
-#--------------- OUTLOOK CONNECTION ---------------
+#--------------- EMAIL OBJECTS ---------------
 
-# Connect to Outlook
-outlook = Dispatch("Outlook.Application").GetNamespace("MAPI")
+messages = sub_folder.Items                                                    # Set email object
+emails = range(messages.Count)                                                 # Set emails (plural) to all emails in sub_folder
 
-# Set main folder
-root_folder = outlook.Folders.Item("RAC Reporting") # Change string/number in brackets for root folder change (eg xyz@360insights.com)
+#--------------- CATEGORY VALUE ---------------
 
-print ("The Email Root Folder is -> " + root_folder.Name)
-
-print("*************************")
-
-#--------------- OUTLOOK FOLDER SELECT ---------------
-
-# Set sub folder -> usually just Inbox
-sub_folder = root_folder.Folders['Inbox']
-
-print("The Email Sub Folder is -> " + sub_folder.Name)
-
-# set Email object
-messages = sub_folder.Items
-
-print("There Are " + str(messages.Count) + " Emails In This Folder")
-
-# Set emails (plural) to all emails in sub_folder
-emails = range(messages.Count)
-
-""" 
-Optional -> print all email subjects in sub_folder
-
-for message in your_folder.Items:
-    print(message.Subject)
-"""
-
-#--------------- SET CATEGORY VALUE ---------------
-
-# Change Outlook category marker name here
-named_category = 'Scotty'
+named_category = "Scotty"                                                      # Set Outlook category marker name
 
 #--------------- REPORT LIST ---------------
 
 # Report List
-report_list =["RAC Different Dates Report",                         # Main Report
-              "All Clients Duplicate Serial Report",                # Main Report
-              "RAC CVI Consumer Check v2 Report",                   # CVI Report
-              "RAC HVAC Cross Module Compliance",                   # Lennox Report
-              "Lennox Dup Serial Exception Report",                 # Lennox Report
-              "Lennox Duplicate Serial report",                     # Lennox Report
-              "RAC Lennox Potential Over Payments report"]          # Lennox Report
+report_list =["RAC Different Dates Report",                # Main Report
+              "All Clients Duplicate Serial Report",       # Main Report
+              "RAC CVI Consumer Check v2 Report",          # CVI Report
+              "RAC HVAC Cross Module Compliance",          # Lennox Report
+              "Lennox Dup Serial Exception Report",        # Lennox Report
+              "Lennox Duplicate Serial report",            # Lennox Report
+              "RAC Lennox Potential Over Payments report"] # Lennox Report
 
 # Compile a regular expression pattern into a regular expression object, which can be used for matching
-# Source -> https://stackoverflow.com/questions/6750240/how-to-do-re-compile-with-a-list-in-python/6750274#6750274          
-report_str = re.compile(r'\b(?:%s)\b' % '|'.join(report_list))     
+# Source -> https://stackoverflow.com/questions/6750240/how-to-do-re-compile-with-a-list-in-python/6750274#6750274    
+report_string = re.compile(r'\b(?:%s)\b' % '|'.join(report_list))     
 
 #--------------- CATEGORIZE & DOWNLOAD ---------------
 
-print("*************************")
-
-"""
-needed_email = [messages[email].Subject for email in emails if re.findall(report_str, messages[email].Subject)]
-
-print(needed_email)
-
-for i in needed_email:
+def categorize_and_download_outlook_reports():
+    """
+    Loops through emails in Outlook sub_folder to categorize and download them 
+    """
+    os.chdir(save_path) # Change working directory to download path
     
-    i.GetInspector()
-    i.Categories = named_category 
-    i.Save()
+    print("The Download File Path is -> " + save_path)
+    print("*************************")
     
-    print("Successfully Actioned   -> " + i)
-    
+    print ("The Email Root Folder is -> " + root_folder.Name)
+    print("*************************")
 
-"""
-
-# Loop to find report emails to categorize & download
-for email in emails:
+    print("The Email Sub Folder is -> " + sub_folder.Name)
+    print("*************************")
     
-    # Searches list of reports and finds all hits in email Subject Line
-    if re.findall(report_str, messages[email].Subject):
+    print("There Are " + str(messages.Count) + " Emails In This Folder")
+    print("*************************")
     
-        # Categorize
-        messages[email].GetInspector()
-        messages[email].Categories = named_category 
-        messages[email].Save()
+    # Loop
+    for email in emails:
         
-        print("Successfully Categorized -> " + messages[email].Subject)
-
-        # Download attachments
-        for attachment in messages[email].Attachments:
-            attachment.SaveAsFile(os.path.join(file_path, attachment.FileName))
-
-            print("Successfully Downloaded  -> " + messages[email].Attachments.Item(1).DisplayName)
+        # Searches list of reports and finds all hits in email Subject Line
+        if re.findall(report_string, messages[email].Subject):
+        
+            # Categorize
+            messages[email].GetInspector()
+            messages[email].Categories = named_category 
+            messages[email].Save()
             
-#--------------- ENDING ---------------
+            print("Successfully Categorized -> " + messages[email].Subject)
+
+            # Download attachment
+            for attachment in messages[email].Attachments:
+                attachment.SaveAsFile(os.path.join(save_path, attachment.FileName))
+
+                print("Successfully Downloaded  -> " + messages[email].Attachments.Item(1).DisplayName)
+                
+                print("*************************")
+        
+    else:
+        print("No Reports Found")
+
+# Call loop function
+categorize_and_download_outlook_reports()
+
+#--------------- SCRIPT COMPLETED ---------------
 
 print("*************************")
 
