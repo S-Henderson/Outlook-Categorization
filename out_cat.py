@@ -10,7 +10,7 @@ from win32com.client import Dispatch
 
 #--------------- PURPOSE ---------------
 
-print("Purpose: In Outlook find reports to categorize and downloads attachments based on Subject line search")
+print("Purpose: In Outlook, find reports to categorize and download attachment based on Subject line search")
 
 print("*************************")
 
