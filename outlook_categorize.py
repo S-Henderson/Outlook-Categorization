@@ -1,15 +1,15 @@
 """ 
-------------------------------------------------------------
+############################################################
 Name         : Outlook Categorize
 Author       : Scott Henderson
 Created      : 10/10/2020
-Last Updated : 10/14/2020
+Last Updated : 4/26/2021
 Purpose      : In Outlook, find reports to categorize and download attachment based on email Subject line search
 Input        : Outlook emails in RAC Reporting inbox
 Output       : Categorized Outlook emails in RAC reporting inbox & downloaded attachments into local downloads folder
 Workflow     : Connect to Outlook inbox, combine reports into string to search, loop through email inbox based on Subject line,
                find matched emails, categorize them and download the attachment
-------------------------------------------------------------
+############################################################
 """
 
 import os
@@ -35,100 +35,103 @@ print("------------------------------")
 print("Purpose: In Outlook, find reports to categorize and download their file attachment based on a Subject line search match")
 print("------------------------------")
 
+#--------------- SAVE PATH ---------------#
+
+# To save attachments to Downloads folder
+save_path = os.path.join(os.path.expanduser("~"), "Downloads")
+
+os.chdir(save_path)
+
+#--------------- CATEGORY VALUE ---------------#
+
+named_category = "Scotty"                    
+
 #--------------- OUTLOOK CONNECTION ---------------#
 
-save_path = os.path.join(os.path.expanduser("~"), "Downloads") # Set download path for report files
 outlook = Dispatch("Outlook.Application").GetNamespace("MAPI") # Outlook connection
 
 #--------------- SELECT FOLDERS ---------------#
 
-root_folder = outlook.Folders.Item("RAC Reporting")            # Set main folder
-sub_folder = root_folder.Folders['Inbox']                      # Set sub folder -> usually just Inbox
-
-#--------------- EMAIL OBJECTS ---------------#
-
-messages = sub_folder.Items                                    # Set email object
-emails = range(messages.Count)                                 # Set emails (plural) to all emails in sub_folder
-
-#--------------- CATEGORY VALUE ---------------#
-
-named_category = "Scotty"                                      # Set Outlook category marker name
+inbox = outlook.Folders.Item("RAC Reporting").Folders['Inbox']
 
 #--------------- REPORT LIST ---------------#
 
 # Report List
-report_list = ["RAC Different Dates Report",                # Main Report
-               "RAC CVI Consumer Check v2 Report",          # CVI Report
-               "RAC HVAC Cross Module Compliance",          # Lennox Report
-               "Lennox Dup Serial Exception Report",        # Lennox Report
-               "Lennox Duplicate Serial report",            # Lennox Report
-               "RAC Lennox Potential Over Payments report", # Lennox Report
-               "Alcon Duplicate Serial Report V2",          # Amanda Report
-               "Alcon Invalid Codes",                       # Amanda Report
-               "Alcon Invalid Codes 2.0",                   # Amanda Report
-               "CVICA Purchase Date to Submission Date"]    # Amanda Report     
+report_list = [
+    "RAC CVI Consumer Check v2 Report",          # CVI Report
+    "RAC HVAC Cross Module Compliance",          # Lennox Report
+    "Lennox Dup Serial Exception Report",        # Lennox Report
+    "Lennox Duplicate Serial report",            # Lennox Report
+    "RAC Lennox Potential Over Payments report", # Lennox Report
+    "Alcon Duplicate Serial Report V2",          # Amanda Report
+    "Alcon Invalid Codes",                       # Amanda Report
+    "Alcon Invalid Codes 2.0",                   # Amanda Report
+    "CVICA Purchase Date to Submission Date"     # Amanda Report
+]         
               
-
 # Compile a regular expression pattern into a regular expression object, which can be used for matching
 # Source -> https://stackoverflow.com/questions/6750240/how-to-do-re-compile-with-a-list-in-python/6750274#6750274    
 report_string = re.compile(r'\b(?:%s)\b' % '|'.join(report_list))
 
-#--------------- CHANGE WORKING DIRECTORY ---------------#
-
-# To save attachments to Downloads folder
-os.chdir(save_path) 
-
 #--------------- CATEGORIZE & DOWNLOAD ---------------#
+
+# https://stackoverflow.com/questions/45442442/os-not-letting-me-save-email-attachment-using-pywin32
+
+emails = inbox.Items  
 
 def categorize_and_download_outlook_reports():
     """
-    Loops through emails in Outlook sub_folder to categorize and download their file attachment 
+    Loops through emails in Outlook inbox to categorize and download the file attachment 
     """
     
     print("The Download File Path is -> " + save_path)
     print("------------------------------")
     
-    print ("The Email Root Folder is -> " + root_folder.Name)
-    print("------------------------------")
-
-    print("The Email Sub Folder is -> " + sub_folder.Name)
+    print ("The Email Folder is -> " + inbox.Name)
     print("------------------------------")
     
-    print("There Are " + str(messages.Count) + " Emails In This Folder")
+    print("There Are " + str(emails.Count) + " Emails In This Folder")
     print("------------------------------")
+
+    for email in list(emails):
+        
+        #Find relevent emails
+        if re.findall(report_string, email.Subject):
+            
+            # Categorize emails
+            email.GetInspector()
+            email.Categories = named_category 
+            email.Save()
     
-    # Loop
-    for email in emails:
-        
-        # Searches list of reports and finds all hits in email Subject Line
-        if re.findall(report_string, messages[email].Subject):
-        
-            # Categorize
-            messages[email].GetInspector()
-            messages[email].Categories = named_category 
-            messages[email].Save()
+            print("Successfully Categorized -> " + email.Subject)
+    
+            # Check for attachments
+            email_attachments = email.Attachments
             
-            print("Successfully Categorized -> " + messages[email].Subject)
-
-            # Download attachment
-            for attachment in messages[email].Attachments:
+            print(str(email_attachments.Count) + ' attachments found.')
             
-                attachment.SaveAsFile(os.path.join(save_path, attachment.FileName))
-
-                print("Successfully Downloaded  -> " + messages[email].Attachments.Item(1).DisplayName)
+            if email_attachments.Count > 0:
                 
-                print("------------------------------")
-        
-    else:
+                for i in range(email_attachments.Count):
+                    
+                    email_attachment = email_attachments.Item(i + 1)
+                    
+                    # Download attachments
+                    email_attachment.SaveAsFile(os.path.join(save_path, email_attachment.FileName))
     
-        print("No More Reports Found")
+                    print("Successfully Downloaded  -> " + str(email_attachment))
+                    print("------------------------------")
+    
+            else:
+                print('No Attachment Found To Download.')
+                print("------------------------------")
 
 # Call loop function
 categorize_and_download_outlook_reports()
 
 #--------------- SCRIPT COMPLETED ---------------#
 
-print("------------------------------")
+#print("------------------------------")
 print("Script Completed")
 
 #input("Press Enter to Continue...")
