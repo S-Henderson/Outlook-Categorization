@@ -14,7 +14,6 @@ Workflow     : Connect to Outlook inbox, combine reports into string to search, 
 
 import os
 import re
-
 from win32com.client import Dispatch
 
 #--------------- ASCII ART ---------------#
@@ -28,18 +27,17 @@ ________          __  .__                 __     _________         __           
         \/                                    \/         \/     \/          \/_____/                       \/    \/ 
 """)
 
-print("------------------------------")
+print("############################################################")
 
 #--------------- PURPOSE ---------------#
 
 print("Purpose: In Outlook, find reports to categorize and download their file attachment based on a Subject line search match")
-print("------------------------------")
+print("############################################################")
 
 #--------------- SAVE PATH ---------------#
 
-# To save attachments to Downloads folder
+# To save attachments to user Downloads folder
 save_path = os.path.join(os.path.expanduser("~"), "Downloads")
-
 os.chdir(save_path)
 
 #--------------- CATEGORY VALUE ---------------#
@@ -49,53 +47,42 @@ named_category = "Scotty"
 #--------------- OUTLOOK CONNECTION ---------------#
 
 outlook = Dispatch("Outlook.Application").GetNamespace("MAPI") # Outlook connection
-
-#--------------- SELECT FOLDERS ---------------#
-
-inbox = outlook.Folders.Item("RAC Reporting").Folders['Inbox']
+inbox = outlook.Folders.Item("RAC Reporting").Folders['Inbox'] # Folder selection
+emails = inbox.Items 
 
 #--------------- REPORT LIST ---------------#
 
-# Report List
 report_list = [
-    "RAC CVI Consumer Check v2 Report",          # CVI Report
-    "RAC HVAC Cross Module Compliance",          # Lennox Report
-    "Lennox Dup Serial Exception Report",        # Lennox Report
-    "Lennox Duplicate Serial report",            # Lennox Report
-    "RAC Lennox Potential Over Payments report", # Lennox Report
-    "Alcon Duplicate Serial Report V2",          # Amanda Report
-    "Alcon Invalid Codes",                       # Amanda Report
-    "Alcon Invalid Codes 2.0",                   # Amanda Report
-    "CVICA Purchase Date to Submission Date"     # Amanda Report
+    "RAC CVI Consumer Check v2 Report",  
+    "RAC HVAC Cross Module Compliance",
+    "Lennox Dup Serial Exception Report",
+    "Lennox Duplicate Serial report",
+    "RAC Lennox Potential Over Payments report",
+    "Alcon Duplicate Serial Report V2",
+    "Alcon Invalid Codes",
+    "Alcon Invalid Codes 2.0",
+    "CVICA Purchase Date to Submission Date",
+    "RAC Different Dates Report"
 ]         
               
 # Compile a regular expression pattern into a regular expression object, which can be used for matching
-# Source -> https://stackoverflow.com/questions/6750240/how-to-do-re-compile-with-a-list-in-python/6750274#6750274    
+# https://stackoverflow.com/questions/6750240/how-to-do-re-compile-with-a-list-in-python/6750274#6750274    
 report_string = re.compile(r'\b(?:%s)\b' % '|'.join(report_list))
 
 #--------------- CATEGORIZE & DOWNLOAD ---------------#
 
-# https://stackoverflow.com/questions/45442442/os-not-letting-me-save-email-attachment-using-pywin32
-
-emails = inbox.Items  
+# https://stackoverflow.com/questions/45442442/os-not-letting-me-save-email-attachment-using-pywin32 
 
 def categorize_and_download_outlook_reports():
     """
     Loops through emails in Outlook inbox to categorize and download the file attachment 
     """
-    
     print("The Download File Path is -> " + save_path)
-    print("------------------------------")
-    
     print ("The Email Folder is -> " + inbox.Name)
-    print("------------------------------")
-    
     print("There Are " + str(emails.Count) + " Emails In This Folder")
-    print("------------------------------")
+    print("############################################################")
 
     for email in list(emails):
-        
-        #Find relevent emails
         if re.findall(report_string, email.Subject):
             
             # Categorize emails
@@ -107,27 +94,25 @@ def categorize_and_download_outlook_reports():
     
             # Check for attachments
             email_attachments = email.Attachments
-            
             print(str(email_attachments.Count) + ' attachments found.')
             
             if email_attachments.Count > 0:
-                
                 for i in range(email_attachments.Count):
                     
-                    email_attachment = email_attachments.Item(i + 1)
-                    
-                    # Download attachments
+                    # MS Outlook list indices are 1-based hence the + 1
+                    email_attachment = email_attachments.Item(i + 1) 
                     email_attachment.SaveAsFile(os.path.join(save_path, email_attachment.FileName))
-    
+                    
                     print("Successfully Downloaded  -> " + str(email_attachment))
-                    print("------------------------------")
-    
+                    print("############################################################")
+            
             else:
                 print('No Attachment Found To Download.')
-                print("------------------------------")
+                print("############################################################")
 
-# Call loop function
-categorize_and_download_outlook_reports()
+# Call function
+if __name__ == '__main__':
+    categorize_and_download_outlook_reports()
 
 #--------------- SCRIPT COMPLETED ---------------#
 
