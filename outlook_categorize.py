@@ -34,22 +34,6 @@ print("############################################################")
 print("Purpose: In Outlook, find reports to categorize and download their file attachment based on a Subject line search match")
 print("############################################################")
 
-#--------------- SAVE PATH ---------------#
-
-# To save attachments to user Downloads folder
-save_path = os.path.join(os.path.expanduser("~"), "Downloads")
-os.chdir(save_path)
-
-#--------------- CATEGORY VALUE ---------------#
-
-named_category = "Scotty"                    
-
-#--------------- OUTLOOK CONNECTION ---------------#
-
-outlook = Dispatch("Outlook.Application").GetNamespace("MAPI") # Outlook connection
-inbox = outlook.Folders.Item("RAC Reporting").Folders['Inbox'] # Folder selection
-emails = inbox.Items 
-
 #--------------- REPORT LIST ---------------#
 
 report_list = [
@@ -68,6 +52,22 @@ report_list = [
 # Compile a regular expression pattern into a regular expression object, which can be used for matching
 # https://stackoverflow.com/questions/6750240/how-to-do-re-compile-with-a-list-in-python/6750274#6750274    
 report_string = re.compile(r'\b(?:%s)\b' % '|'.join(report_list))
+
+#--------------- OUTLOOK CATEGORY VALUE ---------------#
+
+named_category = "Scotty"  
+
+#--------------- SAVE PATH ---------------#
+
+# To save attachments to user Downloads folder
+save_path = os.path.join(os.path.expanduser("~"), "Downloads")
+os.chdir(save_path)
+
+#--------------- OUTLOOK CONNECTION ---------------#
+
+outlook = Dispatch("Outlook.Application").GetNamespace("MAPI") # Outlook connection
+inbox = outlook.Folders.Item("RAC Reporting").Folders['Inbox'] # Folder selection
+emails = inbox.Items 
 
 #--------------- CATEGORIZE & DOWNLOAD ---------------#
 
