@@ -3,7 +3,7 @@
 Name         : Outlook Categorization
 Author       : Scott Henderson
 Created      : 10/10/2020
-Last Updated : 4/26/2021
+Last Updated : 4/28/2021
 Purpose      : In Outlook, find reports to categorize and download attachment based on email Subject line search
 Input        : Outlook emails in RAC Reporting inbox
 Output       : Categorized Outlook emails in RAC reporting inbox & downloaded attachments into local downloads folder
