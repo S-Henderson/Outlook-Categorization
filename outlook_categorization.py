@@ -113,10 +113,11 @@ def categorize_and_download_outlook_reports():
 # Call function
 if __name__ == '__main__':
     categorize_and_download_outlook_reports()
+    print("############################################################")
 
 #--------------- SCRIPT COMPLETED ---------------#
 
-#print("------------------------------")
+print("############################################################")
 print("Script Completed")
 
 #input("Press Enter to Continue...")
