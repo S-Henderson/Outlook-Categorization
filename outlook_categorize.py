@@ -1,6 +1,6 @@
 """ 
 ############################################################
-Name         : Outlook Categorize
+Name         : Outlook Categorization
 Author       : Scott Henderson
 Created      : 10/10/2020
 Last Updated : 4/26/2021
