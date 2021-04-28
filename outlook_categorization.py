@@ -103,7 +103,7 @@ def categorize_and_download_outlook_reports():
                     email_attachment = email_attachments.Item(i + 1) 
                     email_attachment.SaveAsFile(os.path.join(save_path, email_attachment.FileName))
                     
-                    print("Successfully Downloaded  -> " + str(email_attachment))
+                    print("Successfully Downloaded  -> " + str(email_attachment.FileName))
                     print("############################################################")
             
             else:
